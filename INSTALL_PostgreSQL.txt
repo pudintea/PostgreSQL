@@ -1,0 +1,155 @@
+UBUNTU 22.04
+=============
+Install
+> sudo apt update
+> sudo apt install postgresql postgresql-contrib
+
+postgresql = Database server-nya
+postgresql-contrib = Fitur tambahan seperti UUID generator, dsb
+
+Setelah itu, pastikan service-nya jalan:
+> sudo systemctl status postgresql
+
+Kalau belum jalan:
+> sudo systemctl start postgresql
+> sudo systemctl enable postgresql
+
+
+PERINTAH-PERINTAH
+==================
+
+Hal Pertama Setelah Instalasi
+PostgreSQL secara default sudah membuat user postgres.
+
+Untuk masuk ke konsol database:
+> sudo -i -u postgres
+> psql
+
+Prosedur instalasi membuat akun pengguna yang dipanggil postgres yang dikaitkan dengan peran Postgres default.
+Ada beberapa cara untuk memanfaatkan akun ini untuk mengakses Postgres.
+Salah satu caranya adalah beralih ke postgres akun di server Anda dengan menjalankan perintah berikut:
+> sudo -i -u postgres
+
+Kemudian Anda dapat mengakses prompt Postgres dengan menjalankan:
+> psql
+
+Ini akan memasukkan Anda ke prompt PostgreSQL, dan dari sini Anda bebas berinteraksi dengan sistem manajemen basis data segera.
+Untuk keluar dari prompt PostgreSQL, jalankan yang berikut:
+> \q
+
+Ini akan membawa Anda kembali ke postgres Perintah Linux prompt. Untuk kembali ke pengguna sistem reguler Anda, jalankan exit perintah:
+> exit
+
+Cara lain untuk terhubung ke prompt Postgres adalah dengan menjalankan psql perintah sebagai postgres akun langsung dengan sudo:
+sudo -u postgres psql
+
+Ini akan mencatat Anda langsung ke Postgres tanpa perantara bash shell di antaranya.
+Sekali lagi, Anda dapat keluar dari sesi Postgres interaktif dengan menjalankan yang berikut:
+> \q
+
+
+Script Membuat Username dan Password Baru
+==========================================
+Setelah masuk ke psql, buat user baru:
+> CREATE USER nama_user WITH PASSWORD 'password_user';
+
+Contoh real:
+CREATE USER belajaruser WITH PASSWORD 'belajarsql123';
+
+
+
+Script Membuat Database Baru + Full Access ke User
+==================================================
+Masih di psql, buat database:
+
+> CREATE DATABASE nama_database OWNER nama_user;
+
+Contoh real:
+> CREATE DATABASE dbbelajar OWNER belajaruser;
+
+Kalau mau kasih hak penuh secara manual (jika kamu buat database tanpa OWNER):
+> GRANT ALL PRIVILEGES ON DATABASE nama_database TO nama_user;
+
+
+
+Akses PostgreSQL dari Komputer Windows ke Server Ubuntu
+================================================================
+Ada beberapa langkah:
+
+a. Edit file postgresql.conf
+Lokasi file biasanya:
+> nano /etc/postgresql/14/main/postgresql.conf
+(Ubuntu 22.04 biasanya PostgreSQL 14 atau 15)
+
+Cari baris:
+# listen_addresses = 'localhost'
+
+Ubah jadi:
+listen_addresses = '*'
+Artinya: PostgreSQL menerima koneksi dari mana saja.
+
+b. Edit file pg_hba.conf
+Lokasinya sama, di /etc/postgresql/14/main/pg_hba.conf.
+> nano /etc/postgresql/14/main/pg_hba.conf
+
+Tambahkan baris ini di bawah:
+host    all             all             0.0.0.0/0               md5
+
+Artinya: semua IP boleh masuk asal tahu username dan password.
+
+
+c. Restart PostgreSQL
+Setelah itu restart service:
+> sudo systemctl restart postgresql
+
+d. Buka Firewall Ubuntu
+Kalau firewall aktif (ufw), izinkan port PostgreSQL (default 5432):
+> sudo ufw allow 5432/tcp
+
+e. Gunakan Tools di Windows
+Install pgAdmin (GUI untuk PostgreSQL)
+
+Atau gunakan DBeaver, HeidiSQL, atau koneksi manual dari aplikasi.
+Untuk koneksi, yang kamu butuhkan:
+Host/IP: IP server Ubuntu kamu
+Port: 5432
+Username: belajaruser
+Password: belajarsql123
+Database: dbbelajar
+
+Kesimpulan Praktis
+===================
+Install → sudo apt install
+
+Login pertama → sudo -i -u postgres lalu psql
+
+Membuat user + database → pakai CREATE USER, CREATE DATABASE
+
+Agar Windows bisa connect → edit postgresql.conf dan pg_hba.conf
+
+Kalau mau, saya bisa buatkan file contoh SQL script lengkap (create_user.sql, create_db.sql) agar kamu tinggal copy-paste. Mau sekalian? 🚀
+(atau sekalian mau saya ajari membuat backup/restore di PostgreSQL juga?)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==
+== ==================== PUDIN.MY.ID ==============================
+==
